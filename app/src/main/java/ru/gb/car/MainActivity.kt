@@ -14,6 +14,7 @@ import ru.gb.car.databinding.ActivityMainBinding
 import ru.gb.car.entity.Car
 import ru.gb.car.entity.Point
 import kotlin.math.atan
+import kotlin.math.atan2
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -59,8 +60,8 @@ class MainActivity : AppCompatActivity() {
             if (motionEvent.action == MotionEvent.ACTION_DOWN) {
                 point.x = motionEvent.x
                 point.y = motionEvent.y
-                val angle = atan( (point.y - car.y) / (point.x - car.x) ) / (3.1415 * 2) * 360
-                car.angle = angle.toFloat() + 90
+                val angle = atan2( (point.y - car.y) , (point.x - car.x) ) * 180.0f / 3.14159f
+                car.angle = angle + 90
                 carToPoint(surfaceHolder)
                 return@setOnTouchListener true
             } else {
