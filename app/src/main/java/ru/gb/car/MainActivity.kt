@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import ru.gb.car.databinding.ActivityMainBinding
 import ru.gb.car.entity.Car
 import ru.gb.car.entity.Point
+import kotlin.math.atan
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -35,7 +36,9 @@ class MainActivity : AppCompatActivity() {
         binding.surface.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
                 this@MainActivity.surfaceHolder = surfaceHolder
-                val canvas =surfaceHolder.lockCanvas()
+                val canvas = surfaceHolder.lockCanvas()
+                car.x = (canvas.width / 2).toFloat()
+                car.y = (canvas.height / 2).toFloat()
                 drawCar(canvas)
                 surfaceHolder.unlockCanvasAndPost(canvas)
 
@@ -56,14 +59,9 @@ class MainActivity : AppCompatActivity() {
             if (motionEvent.action == MotionEvent.ACTION_DOWN) {
                 point.x = motionEvent.x
                 point.y = motionEvent.y
+                val angle = atan( (point.y - car.y) / (point.x - car.x) ) / (3.1415 * 2) * 360
+                car.angle = angle.toFloat() + 90
                 carToPoint(surfaceHolder)
-/*
-                val canvas = surfaceHolder?.lockCanvas()
-                if (canvas != null) {
-                    render(canvas)
-                    surfaceHolder?.unlockCanvasAndPost(canvas)
-                }
-*/
                 return@setOnTouchListener true
             } else {
                 return@setOnTouchListener false
@@ -79,19 +77,19 @@ class MainActivity : AppCompatActivity() {
                 val canvas = surfaceHolder?.lockCanvas()
                 if (canvas != null) {
                     render(canvas)
-                    surfaceHolder?.unlockCanvasAndPost(canvas)
+                    surfaceHolder.unlockCanvasAndPost(canvas)
                 }
                 car.x += dx
                 car.y += dy
-                delay(100)
+                delay(10)
             }
         }
     }
 
-    private fun render(canvas: Canvas){
+    private fun render(canvas: Canvas) {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        drawCar(canvas)
         drawPoint(canvas)
+        drawCar(canvas)
     }
 
     private fun drawCar(canvas: Canvas) {
@@ -103,7 +101,9 @@ class MainActivity : AppCompatActivity() {
             Bitmap.createBitmap(carBitmap, 0, 0, carBitmap.width, carBitmap.height, matrix, false)
         canvas.drawBitmap(
             rotatedBitmap,
-            car.x - rotatedBitmap.width.toFloat() / 2, car.y - rotatedBitmap.height.toFloat() / 2, null
+            car.x - rotatedBitmap.width.toFloat() / 2,
+            car.y - rotatedBitmap.height.toFloat() / 2,
+            null
         )
     }
 
@@ -112,10 +112,20 @@ class MainActivity : AppCompatActivity() {
         matrix.postScale(0.1f, 0.1f)
 
         val rotatedBitmap =
-            Bitmap.createBitmap(pointBitmap, 0, 0, pointBitmap.width, pointBitmap.height, matrix, false)
+            Bitmap.createBitmap(
+                pointBitmap,
+                0,
+                0,
+                pointBitmap.width,
+                pointBitmap.height,
+                matrix,
+                false
+            )
         canvas.drawBitmap(
             rotatedBitmap,
-            point.x - rotatedBitmap.width.toFloat() / 2, point.y - rotatedBitmap.height.toFloat() / 2, null
+            point.x - rotatedBitmap.width.toFloat() / 2,
+            point.y - rotatedBitmap.height.toFloat() / 2,
+            null
         )
     }
 }
