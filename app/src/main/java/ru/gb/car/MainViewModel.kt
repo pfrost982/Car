@@ -51,8 +51,8 @@ class MainViewModel : ViewModel() {
                     render(canvas)
                     surfaceHolder?.unlockCanvasAndPost(canvas)
                 }
-                car.x = car.x + PIXEL_MACHINE_SPEED * cos(car.angle * 3.14159f / 180.0f)
-                car.y = car.y + PIXEL_MACHINE_SPEED * sin(car.angle * 3.14159f / 180.0f)
+                car.x = car.x + PIXEL_MACHINE_SPEED * cos(car.angle * DEGREES_TO_RADIANS)
+                car.y = car.y + PIXEL_MACHINE_SPEED * sin(car.angle * DEGREES_TO_RADIANS)
                 car.angle = car.angle + dAngle()
                 point.angle += POINT_ROTATION_SPEED
             }
@@ -60,7 +60,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun dAngle(): Float {
-        val angle = atan2((point.y - car.y), (point.x - car.x)) * 180.0f / 3.14159f
+        val angle = atan2((point.y - car.y), (point.x - car.x)) * RADIANS_TO_DEGREES
         if (abs(angle - car.angle) < MAX_ANGLE_OF_ROTATION) {
             car.angle = angle
             return 0f
@@ -122,5 +122,7 @@ class MainViewModel : ViewModel() {
         const val POINT_ROTATION_SPEED = 3f
         const val SCALING_FACTOR = 0.1f
         const val PIXEL_ARRIVAL_ACCURACY = 40
+        const val RADIANS_TO_DEGREES = 180.0f / 3.14159f
+        const val DEGREES_TO_RADIANS = 3.14159f / 180.0f
     }
 }
