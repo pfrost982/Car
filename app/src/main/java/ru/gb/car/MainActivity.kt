@@ -28,10 +28,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.setSurfaceHolder(surfaceHolder)
             }
 
-            override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {
-                viewModel.setSurfaceHolder(surfaceHolder)
-            }
-
+            override fun surfaceChanged(surfaceHolder: SurfaceHolder, i: Int, i1: Int, i2: Int) {}
             override fun surfaceDestroyed(surfaceHolder: SurfaceHolder) {}
         })
         viewModel.setBitmap(

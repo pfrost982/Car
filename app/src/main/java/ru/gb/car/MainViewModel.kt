@@ -3,9 +3,7 @@ package ru.gb.car
 import android.graphics.*
 import android.view.SurfaceHolder
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import ru.gb.car.entity.Car
 import ru.gb.car.entity.Point
 import kotlin.math.atan2
@@ -16,6 +14,8 @@ class MainViewModel : ViewModel() {
     private lateinit var pointBitmap: Bitmap
     private val car = Car()
     private val point = Point()
+    private val scope = CoroutineScope(Dispatchers.IO)
+
 
     fun setSurfaceHolder(surfaceHolder: SurfaceHolder) {
         this.surfaceHolder = surfaceHolder
@@ -32,17 +32,16 @@ class MainViewModel : ViewModel() {
         pointBitmap = point
     }
 
-    fun newPoint(x: Float, y: Float){
+    fun newPoint(x: Float, y: Float) {
         point.x = x
         point.y = y
         carToPoint(surfaceHolder)
     }
 
     private fun carToPoint(surfaceHolder: SurfaceHolder?) {
-        viewModelScope.launch {
-
+        scope.launch {
             val angle = atan2((point.y - car.y), (point.x - car.x)) * 180.0f / 3.14159f
-            car.angle = angle + 90
+            car.angle = angle
 
             point.angle = 0f
             val dPointAngle = 360f / 100
@@ -58,7 +57,6 @@ class MainViewModel : ViewModel() {
                 car.x += dx
                 car.y += dy
                 point.angle += dPointAngle
-                delay(10)
             }
         }
     }
@@ -72,7 +70,7 @@ class MainViewModel : ViewModel() {
     private fun drawCar(canvas: Canvas) {
         val matrix = Matrix()
         matrix.postScale(0.1f, 0.1f)
-        matrix.postRotate(car.angle)
+        matrix.postRotate(car.angle + 90)
 
         val rotatedBitmap =
             Bitmap.createBitmap(carBitmap, 0, 0, carBitmap.width, carBitmap.height, matrix, false)
