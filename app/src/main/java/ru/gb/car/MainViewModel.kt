@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.*
 import ru.gb.car.entity.Car
 import ru.gb.car.entity.Point
-import kotlin.math.atan2
+import kotlin.math.*
 
 class MainViewModel : ViewModel() {
     private var surfaceHolder: SurfaceHolder? = null
@@ -14,6 +14,7 @@ class MainViewModel : ViewModel() {
     private lateinit var pointBitmap: Bitmap
     private val car = Car()
     private val point = Point()
+    private val matrix = Matrix()
     private val scope = CoroutineScope(Dispatchers.IO)
 
 
@@ -40,26 +41,40 @@ class MainViewModel : ViewModel() {
 
     private fun carToPoint(surfaceHolder: SurfaceHolder?) {
         scope.launch {
-            val angle = atan2((point.y - car.y), (point.x - car.x)) * 180.0f / 3.14159f
-            car.angle = angle
-
-            point.angle = 0f
-            val dPointAngle = 360f / 100
-
-            val dx = (point.x - car.x) / 100
-            val dy = (point.y - car.y) / 100
-            for (i in 1..100) {
+            while (distance() > 50) {
                 val canvas = surfaceHolder?.lockCanvas()
                 if (canvas != null) {
                     render(canvas)
                     surfaceHolder.unlockCanvasAndPost(canvas)
                 }
-                car.x += dx
-                car.y += dy
-                point.angle += dPointAngle
+                car.x = car.x + MACHINE_SPEED * cos(car.angle * 3.14159f / 180.0f)
+                car.y = car.y + MACHINE_SPEED * sin(car.angle * 3.14159f / 180.0f)
+                car.angle = car.angle + dAngle()
+
+                point.angle += POINT_ROTATION_SPEED
             }
         }
     }
+
+    private fun dAngle(): Float {
+        val angle = atan2((point.y - car.y), (point.x - car.x)) * 180.0f / 3.14159f
+        if (abs(angle - car.angle) < 1f) {
+            car.angle = angle
+            return 0f
+        }
+        if (abs(angle - car.angle) < 180) {
+            if ((angle - car.angle) < 0) return MAX_ANGLE_OF_ROTATION * -1
+            if ((angle - car.angle) > 0) return MAX_ANGLE_OF_ROTATION
+        }
+        if (abs(angle - car.angle) >= 180) {
+            if ((angle - car.angle) < 0) return MAX_ANGLE_OF_ROTATION
+            if ((angle - car.angle) > 0) return MAX_ANGLE_OF_ROTATION * -1
+        }
+        return 0f
+    }
+
+    private fun distance() =
+        sqrt((point.x - car.x) * (point.x - car.x) + (point.y - car.y) * (point.y - car.y))
 
     private fun render(canvas: Canvas) {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
@@ -68,9 +83,8 @@ class MainViewModel : ViewModel() {
     }
 
     private fun drawCar(canvas: Canvas) {
-        val matrix = Matrix()
+        matrix.setRotate(car.angle + 90)
         matrix.postScale(0.1f, 0.1f)
-        matrix.postRotate(car.angle + 90)
 
         val rotatedBitmap =
             Bitmap.createBitmap(carBitmap, 0, 0, carBitmap.width, carBitmap.height, matrix, false)
@@ -83,19 +97,12 @@ class MainViewModel : ViewModel() {
     }
 
     private fun drawPoint(canvas: Canvas) {
-        val matrix = Matrix()
+        matrix.setRotate(point.angle)
         matrix.postScale(0.1f, 0.1f)
-        matrix.postRotate(point.angle)
 
         val rotatedBitmap =
             Bitmap.createBitmap(
-                pointBitmap,
-                0,
-                0,
-                pointBitmap.width,
-                pointBitmap.height,
-                matrix,
-                false
+                pointBitmap, 0, 0, pointBitmap.width, pointBitmap.height, matrix, false
             )
         canvas.drawBitmap(
             rotatedBitmap,
@@ -108,5 +115,11 @@ class MainViewModel : ViewModel() {
     override fun onCleared() {
         surfaceHolder = null
         super.onCleared()
+    }
+
+    companion object {
+        const val MAX_ANGLE_OF_ROTATION = 1f
+        const val MACHINE_SPEED = 5
+        const val POINT_ROTATION_SPEED = 3f
     }
 }
