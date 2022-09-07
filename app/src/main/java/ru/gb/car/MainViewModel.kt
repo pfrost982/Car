@@ -29,8 +29,9 @@ class MainViewModel : ViewModel() {
     }
 
     fun setBitmap(car: Bitmap, point: Bitmap) {
-        carBitmap = car
-        pointBitmap = point
+        matrix.setScale(SCALING_FACTOR, SCALING_FACTOR)
+        carBitmap = Bitmap.createBitmap(car, 0, 0, car.width, car.height, matrix, false)
+        pointBitmap = Bitmap.createBitmap(point, 0, 0, point.width, point.height, matrix, false)
     }
 
     fun newPoint(x: Float, y: Float) {
@@ -84,7 +85,6 @@ class MainViewModel : ViewModel() {
 
     private fun drawCar(canvas: Canvas) {
         matrix.setRotate(car.angle + 90)
-        matrix.postScale(0.1f, 0.1f)
 
         val rotatedBitmap =
             Bitmap.createBitmap(carBitmap, 0, 0, carBitmap.width, carBitmap.height, matrix, false)
@@ -98,7 +98,6 @@ class MainViewModel : ViewModel() {
 
     private fun drawPoint(canvas: Canvas) {
         matrix.setRotate(point.angle)
-        matrix.postScale(0.1f, 0.1f)
 
         val rotatedBitmap =
             Bitmap.createBitmap(
@@ -121,5 +120,6 @@ class MainViewModel : ViewModel() {
         const val MAX_ANGLE_OF_ROTATION = 1f
         const val MACHINE_SPEED = 5
         const val POINT_ROTATION_SPEED = 3f
+        const val SCALING_FACTOR = 0.1f
     }
 }
