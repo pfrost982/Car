@@ -12,44 +12,49 @@ class MainViewModel : ViewModel() {
     private var surfaceHolder: SurfaceHolder? = null
     private lateinit var carBitmap: Bitmap
     private lateinit var pointBitmap: Bitmap
+    private lateinit var asphaltBitmap: Bitmap
     private val car = Car()
     private val point = Point()
     private val matrix = Matrix()
     private val scope = CoroutineScope(Dispatchers.IO)
 
-
-    fun setSurfaceHolder(surfaceHolder: SurfaceHolder) {
+    fun setSurfaceHolder(surfaceHolder: SurfaceHolder?) {
         this.surfaceHolder = surfaceHolder
-        val canvas = surfaceHolder.lockCanvas()
-        car.x = (canvas.width / 2).toFloat()
-        car.y = (canvas.height / 2).toFloat()
-        drawCar(canvas)
-        surfaceHolder.unlockCanvasAndPost(canvas)
-
+        val canvas = surfaceHolder?.lockCanvas()
+        if (canvas != null) {
+            car.x = (canvas.width / 2).toFloat()
+            car.y = (canvas.height / 2).toFloat()
+            car.angle = -90f
+            point.x = (canvas.width / 2).toFloat()
+            point.y = (canvas.height / 2).toFloat()
+            render(canvas)
+            surfaceHolder.unlockCanvasAndPost(canvas)
+        }
     }
 
-    fun setBitmap(car: Bitmap, point: Bitmap) {
+    fun setBitmap(car: Bitmap, point: Bitmap, asphalt: Bitmap) {
         matrix.setScale(SCALING_FACTOR, SCALING_FACTOR)
         carBitmap = Bitmap.createBitmap(car, 0, 0, car.width, car.height, matrix, false)
         pointBitmap = Bitmap.createBitmap(point, 0, 0, point.width, point.height, matrix, false)
+        asphaltBitmap = asphalt
     }
 
     fun newPoint(x: Float, y: Float) {
         point.x = x
         point.y = y
-        carToPoint(surfaceHolder)
+        carToPoint()
     }
 
-    private fun carToPoint(surfaceHolder: SurfaceHolder?) {
+    private fun carToPoint() {
         scope.launch {
-            while (distance() > 50) {
+            while (distance() > PIXEL_ARRIVAL_ACCURACY) {
                 val canvas = surfaceHolder?.lockCanvas()
                 if (canvas != null) {
                     render(canvas)
-                    surfaceHolder.unlockCanvasAndPost(canvas)
+                    surfaceHolder?.unlockCanvasAndPost(canvas)
                 }
-                car.x = car.x + MACHINE_SPEED * cos(car.angle * 3.14159f / 180.0f)
-                car.y = car.y + MACHINE_SPEED * sin(car.angle * 3.14159f / 180.0f)
+                car.x = car.x + PIXEL_MACHINE_SPEED * cos(car.angle * 3.14159f / 180.0f)
+                car.y = car.y + PIXEL_MACHINE_SPEED * sin(car.angle * 3.14159f / 180.0f)
                 car.angle = car.angle + dAngle()
                 point.angle += POINT_ROTATION_SPEED
             }
@@ -78,6 +83,7 @@ class MainViewModel : ViewModel() {
 
     private fun render(canvas: Canvas) {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawBitmap(asphaltBitmap, null, Rect(0, 0, canvas.width, canvas.height), null)
         drawPoint(canvas)
         drawCar(canvas)
     }
@@ -114,9 +120,10 @@ class MainViewModel : ViewModel() {
     }
 
     companion object {
-        const val MAX_ANGLE_OF_ROTATION = 1f
-        const val MACHINE_SPEED = 5
+        const val MAX_ANGLE_OF_ROTATION = 2f
+        const val PIXEL_MACHINE_SPEED = 8
         const val POINT_ROTATION_SPEED = 3f
         const val SCALING_FACTOR = 0.1f
+        const val PIXEL_ARRIVAL_ACCURACY = 30
     }
 }

@@ -33,7 +33,8 @@ class MainActivity : AppCompatActivity() {
         })
         viewModel.setBitmap(
             BitmapFactory.decodeResource(resources, R.drawable.car),
-            BitmapFactory.decodeResource(resources, R.drawable.point)
+            BitmapFactory.decodeResource(resources, R.drawable.point),
+            BitmapFactory.decodeResource(resources, R.drawable.asphalt)
         )
 
         binding.surface.setOnTouchListener { _, motionEvent ->
