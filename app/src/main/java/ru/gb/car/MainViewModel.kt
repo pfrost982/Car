@@ -51,7 +51,6 @@ class MainViewModel : ViewModel() {
                 car.x = car.x + MACHINE_SPEED * cos(car.angle * 3.14159f / 180.0f)
                 car.y = car.y + MACHINE_SPEED * sin(car.angle * 3.14159f / 180.0f)
                 car.angle = car.angle + dAngle()
-
                 point.angle += POINT_ROTATION_SPEED
             }
         }
@@ -59,7 +58,7 @@ class MainViewModel : ViewModel() {
 
     private fun dAngle(): Float {
         val angle = atan2((point.y - car.y), (point.x - car.x)) * 180.0f / 3.14159f
-        if (abs(angle - car.angle) < 1f) {
+        if (abs(angle - car.angle) < MAX_ANGLE_OF_ROTATION) {
             car.angle = angle
             return 0f
         }
@@ -85,7 +84,6 @@ class MainViewModel : ViewModel() {
 
     private fun drawCar(canvas: Canvas) {
         matrix.setRotate(car.angle + 90)
-
         val rotatedBitmap =
             Bitmap.createBitmap(carBitmap, 0, 0, carBitmap.width, carBitmap.height, matrix, false)
         canvas.drawBitmap(
@@ -98,7 +96,6 @@ class MainViewModel : ViewModel() {
 
     private fun drawPoint(canvas: Canvas) {
         matrix.setRotate(point.angle)
-
         val rotatedBitmap =
             Bitmap.createBitmap(
                 pointBitmap, 0, 0, pointBitmap.width, pointBitmap.height, matrix, false
