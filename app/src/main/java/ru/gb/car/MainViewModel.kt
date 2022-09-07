@@ -124,6 +124,6 @@ class MainViewModel : ViewModel() {
         const val PIXEL_MACHINE_SPEED = 8
         const val POINT_ROTATION_SPEED = 3f
         const val SCALING_FACTOR = 0.1f
-        const val PIXEL_ARRIVAL_ACCURACY = 30
+        const val PIXEL_ARRIVAL_ACCURACY = 40
     }
 }
