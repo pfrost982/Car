@@ -2,6 +2,7 @@ package ru.gb.car
 
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
+import android.graphics.PixelFormat
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.SurfaceHolder
@@ -22,7 +23,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
+        binding.surface.setZOrderOnTop(true)
+        binding.surface.holder.setFormat(PixelFormat.TRANSPARENT)
         binding.surface.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(surfaceHolder: SurfaceHolder) {
                 viewModel.setSurfaceHolder(surfaceHolder)
@@ -33,8 +35,7 @@ class MainActivity : AppCompatActivity() {
         })
         viewModel.setBitmap(
             BitmapFactory.decodeResource(resources, R.drawable.car),
-            BitmapFactory.decodeResource(resources, R.drawable.point),
-            BitmapFactory.decodeResource(resources, R.drawable.asphalt)
+            BitmapFactory.decodeResource(resources, R.drawable.point)
         )
 
         binding.surface.setOnTouchListener { _, motionEvent ->

@@ -12,7 +12,6 @@ class MainViewModel : ViewModel() {
     private var surfaceHolder: SurfaceHolder? = null
     private lateinit var carBitmap: Bitmap
     private lateinit var pointBitmap: Bitmap
-    private lateinit var asphaltBitmap: Bitmap
     private val car = Car()
     private val point = Point()
     private val matrix = Matrix()
@@ -32,11 +31,10 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun setBitmap(car: Bitmap, point: Bitmap, asphalt: Bitmap) {
+    fun setBitmap(car: Bitmap, point: Bitmap) {
         matrix.setScale(SCALING_FACTOR, SCALING_FACTOR)
         carBitmap = Bitmap.createBitmap(car, 0, 0, car.width, car.height, matrix, false)
         pointBitmap = Bitmap.createBitmap(point, 0, 0, point.width, point.height, matrix, false)
-        asphaltBitmap = asphalt
     }
 
     fun newPoint(x: Float, y: Float) {
@@ -83,7 +81,6 @@ class MainViewModel : ViewModel() {
 
     private fun render(canvas: Canvas) {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawBitmap(asphaltBitmap, null, Rect(0, 0, canvas.width, canvas.height), null)
         drawPoint(canvas)
         drawCar(canvas)
     }
