@@ -15,7 +15,7 @@ class MainViewModel : ViewModel() {
     private val car = Car()
     private val point = Point()
     private val matrix = Matrix()
-    private val scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     fun setSurfaceHolder(surfaceHolder: SurfaceHolder?) {
         this.surfaceHolder = surfaceHolder
@@ -37,7 +37,7 @@ class MainViewModel : ViewModel() {
         pointBitmap = Bitmap.createBitmap(point, 0, 0, point.width, point.height, matrix, false)
     }
 
-    fun newPoint(x: Float, y: Float) {
+    fun setPoint(x: Float, y: Float) {
         point.x = x
         point.y = y
         carToPoint()

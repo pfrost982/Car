@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.surface.setOnTouchListener { _, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-                viewModel.newPoint(motionEvent.x, motionEvent.y)
+                viewModel.setPoint(motionEvent.x, motionEvent.y)
                 return@setOnTouchListener true
             } else {
                 return@setOnTouchListener false
